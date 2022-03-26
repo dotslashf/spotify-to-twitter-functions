@@ -1,9 +1,17 @@
-const functions = require("firebase-functions");
+const functions = require('firebase-functions');
+const fetch = require('node-fetch');
 
-// // Create and Deploy Your First Cloud Functions
-// // https://firebase.google.com/docs/functions/write-firebase-functions
-//
-// exports.helloWorld = functions.https.onRequest((request, response) => {
-//   functions.logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
+exports.getCurrentlyPlaying = functions.pubsub
+  .schedule('every 1 minutes')
+  .onRun(async () => {
+    const response = await fetch(
+      'https://spotify-to-twitter.vercel.app/api/cron/',
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${process.env.SPOTIFY_TO_TWITTER_API_KEY}`,
+        },
+      }
+    );
+    console.log(await response.json());
+  });
